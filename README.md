@@ -233,7 +233,7 @@ docker run -t -i \
  --add-host localdc.corp.example.com:192.168.3.222 \
  -h localdc \
  --name samba \
- --privileged \
+ --cap-add=SYS_ADMIN \
  nowsci/samba-domain
 ```
 
@@ -276,7 +276,7 @@ docker run -t -i \
  --add-host localdc.corp.example.com:192.168.3.222 \
  -h localdc \
  --name samba \
- --privileged \
+ --cap-add=SYS_ADMIN \
  nowsci/samba-domain
 ```
 
@@ -329,7 +329,7 @@ docker run -t -i \
  --add-host remotedc:192.168.6.222 \
  -h localdc \
  --name samba \
- --privileged \
+ --cap-add=SYS_ADMIN \
  --cap-add=NET_ADMIN --device /dev/net/tun \
  nowsci/samba-domain
 ```
@@ -394,10 +394,7 @@ services:
       - localdc.corp.example.com:192.168.3.222
     hostname: localdc
     cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun
-    privileged: true
+      - SYS_ADMIN
     restart: always
 
 # ----------- samba end ----------- #
@@ -462,10 +459,7 @@ services:
       - localdc.corp.example.com:192.168.3.222
     hostname: localdc
     cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun
-    privileged: true
+      - SYS_ADMIN
     restart: always
 
 # ----------- samba end ----------- #
@@ -541,9 +535,9 @@ services:
     hostname: localdc
     cap_add:
       - NET_ADMIN
+      - SYS_ADMIN
     devices:
       - /dev/net/tun
-    privileged: true
     restart: always
 
 # ----------- samba end ----------- #
