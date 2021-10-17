@@ -27,12 +27,12 @@ appSetup () {
 		sleep 30
 	fi
 
-        # Set host ip option
-        if [[ "$HOSTIP" != "NONE" ]]; then
+	# Set host ip option
+	if [[ "$HOSTIP" != "NONE" ]]; then
 		HOSTIP_OPTION="--host-ip=$HOSTIP"
-        else
+	else
 		HOSTIP_OPTION=""
-        fi
+	fi
 
 	# Set up samba
 	mv /etc/krb5.conf /etc/krb5.conf.orig
@@ -81,27 +81,30 @@ appSetup () {
 	else
 		cp -f /etc/samba/external/smb.conf /etc/samba/smb.conf
 	fi
-        
+
 	# Set up supervisor
-	echo "[supervisord]" > /etc/supervisor/conf.d/supervisord.conf
-	echo "nodaemon=true" >> /etc/supervisor/conf.d/supervisord.conf
-	echo "" >> /etc/supervisor/conf.d/supervisord.conf
-	echo "[program:samba]" >> /etc/supervisor/conf.d/supervisord.conf
-	echo "command=/usr/sbin/samba -i" >> /etc/supervisor/conf.d/supervisord.conf
+	sud_conf="/etc/supervisor/supervisord.conf"
+	echo "[supervisord]" > $sud_conf
+	echo "nodaemon=true" >> $sud_conf
+	echo "user=root" >> $sud_conf
+	echo "pidfile=/var/run/supervisord.pid" >> $sud_conf
+	echo "" >> $sud_conf
+	echo "[program:samba]" >> $sud_conf
+	echo "command=/usr/sbin/samba -i" >> $sud_conf
 	if [[ ${MULTISITE,,} == "true" ]]; then
 		if [[ -n $VPNPID ]]; then
 			kill $VPNPID
 		fi
-		echo "" >> /etc/supervisor/conf.d/supervisord.conf
-		echo "[program:openvpn]" >> /etc/supervisor/conf.d/supervisord.conf
-		echo "command=/usr/sbin/openvpn --config /docker.ovpn" >> /etc/supervisor/conf.d/supervisord.conf
+		echo "" >> $sud_conf
+		echo "[program:openvpn]" >> $sud_conf
+		echo "command=/usr/sbin/openvpn --config /docker.ovpn" >> $sud_conf
 	fi
 	
 	appStart
 }
 
 appStart () {
-	/usr/bin/supervisord
+	/usr/bin/supervisord -c /etc/supervisor/supervisord.conf
 }
 
 case "$1" in
