@@ -1,13 +1,8 @@
 FROM ubuntu
 
-LABEL maintainer="Fmstrat <fmstrat@NOSPAM.NO>"
-
 ENV DEBIAN_FRONTEND noninteractive
 
-# Install all apps
-# The second "apt-get install" is for multi-site config (ping is for testing later)
 RUN apt-get update \
-    && apt-get upgrade -y \
     && apt-get install -y \
         pkg-config \
         attr \
@@ -21,14 +16,18 @@ RUN apt-get update \
         krb5-user \
         krb5-kdc \
         supervisor \
-    && apt-get install -y openvpn inetutils-ping \
+        openvpn \
+        inetutils-ping \
+        ldb-tools \
+        vim \
+        curl \
+        ntp \
     && apt-get clean autoclean \
     && apt-get autoremove --yes \
     && rm -rf /var/lib/{apt,dpkg,cache,log}/ \
     && rm -fr /tmp/* /var/tmp/*
 
-# Set up script and run
-COPY init.sh /init.sh
-RUN chmod 755 /init.sh
-
-CMD /init.sh setup
+ADD init.sh /init.sh
+ADD domain.sh /domain.sh
+RUN chmod 755 /init.sh /domain.sh
+CMD /init.sh
